@@ -7,6 +7,9 @@ pub enum Error {
     #[error("Index not found")]
     IndexNotFound,
 
+    #[error("Diff error")]
+    InvalidDiffState,
+
     #[error("Pack not found v={0} p={1}")]
     PackNotFound(u16, u32),
 

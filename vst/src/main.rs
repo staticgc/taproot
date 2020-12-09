@@ -4,6 +4,7 @@ mod get;
 mod put;
 mod commit;
 mod head;
+mod diff;
 
 use util::*;
 
@@ -20,6 +21,7 @@ enum Cli {
     Head(head::HeadCmdArgs),
     Put(put::PutCmdArgs),
     Commit(commit::CommitCmdArgs),
+    Diff(diff::DiffCmdArgs),
 }
 
 
@@ -42,7 +44,10 @@ fn main() -> Result<(), Error> {
         }
         Cli::Head(args) => {
             head::cmd(args)?;
-        }
+        },
+        Cli::Diff(args) => {
+            diff::cmd(args)?;
+        },
     }
     Ok(())
 }

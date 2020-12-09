@@ -46,8 +46,6 @@ impl Tree {
         Ok(t)
     }
 
-
-
     fn load_index_at(ver: u16, kv: &Arc<Box<dyn KeyValue>>) -> Result<Option<Index>, Error> {
         debug!("load index at ver: {}", ver);
         let index_key_buf = "index".as_bytes();
@@ -149,6 +147,7 @@ impl Tree {
 
         Ok(val)
     }
+
 }
 
 pub struct ImmutableTree {

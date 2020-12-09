@@ -40,6 +40,16 @@ impl Index {
         idx
     }
 
+    pub fn get_prefix_version(&self, part: usize) -> u16 {
+        let inner = self.inner.read();
+        inner.version_list[part]
+    }
+
+    pub fn len(&self) -> usize {
+        let inner = self.inner.read();
+        inner.version_list.len()
+    }
+
     pub fn set_version(&self, ver: u16) {
         let mut inner = self.inner.write();
         inner.ver = ver

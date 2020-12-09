@@ -1,12 +1,47 @@
 
+use std::sync::Arc;
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
+pub struct KeyPack {
+    version: u32, 
+    pub map: HashMap<Vec<u8>, u16>,
+}
+
+impl KeyPack {
+    pub fn new() -> Self {
+        KeyPack {
+            version: 1,
+            map: HashMap::new(),
+        }
+    }
+
+    pub fn put(&mut self, ver: u16, key: &[u8]) {
+        self.map.insert(Vec::from(key), ver);
+    }
+
+    pub fn get<'a>(&'a self, key: &[u8]) -> Option<u16> {
+        self.map.get(key).map(|v| *v)
+    }
+
+    pub fn to_vec(&self) -> Result<Vec<u8>, rmp_serde::encode::Error> {
+        let buf = rmp_serde::to_vec(&self)?;
+        Ok(buf)
+    }
+
+    pub fn from_buf(buf: &[u8]) -> Result<Pack, rmp_serde::decode::Error> {
+        let p: Pack = rmp_serde::from_read_ref(buf)?;
+        Ok(p)
+    }
+}
+
+
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Pack {
     version: u32, 
-    map: HashMap<Vec<u8>, (u16, Vec<u8>)>,
+    pub map: HashMap<Vec<u8>, (u16, Vec<u8>)>,
 }
 
 
@@ -36,3 +71,4 @@ impl Pack {
         Ok(p)
     }
 }
+

@@ -5,6 +5,8 @@ use log::debug;
 use keyvalue::KeyValue;
 use crate::tree::{Tree, ImmutableTree};
 use crate::commit::{CommitState};
+use crate::diff::DiffIter;
+use crate::index::Index;
 use crate::Error;
 
 #[derive(Clone)]
@@ -146,4 +148,29 @@ impl VStore {
         &self.cstate
     }
 
+    fn load_index_at(&self, ver: u16)-> Result<Option<Index>, Error> {
+        debug!("load index at ver: {}", ver);
+        let index_key_buf = "index".as_bytes();
+
+        let idx = match self.kv.get(ver, index_key_buf)? {
+            Some(buf) => {
+                let idx = Index::new_with_buf(&buf)?;
+                Some(idx)
+            },
+            None => {
+                None
+            }
+        };
+
+        Ok(idx)
+    }
+
+    pub fn diff(&self, aver: u16, bver: u16) -> Result<DiffIter, Error> {
+        let a_idx = self.load_index_at(aver)?.ok_or(Error::IndexNotFound)?;
+        let b_idx = self.load_index_at(bver)?.ok_or(Error::IndexNotFound)?;
+
+        let d = DiffIter::new(self.kv.clone(), a_idx, b_idx);
+
+        Ok(d)
+    }
 }
