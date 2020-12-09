@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "keyvalue",
+    "valuepack",
+    "vstore",
+    "vst",
+]

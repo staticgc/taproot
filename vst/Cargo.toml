@@ -1,0 +1,15 @@
+[package]
+name = "vst"
+version = "0.1.0"
+authors = ["sudeep"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0"
+env_logger = "0.8"
+clap = "2.33"
+structopt = "0.3"
+vstore = {path="../vstore"}
+keyvalue = {path="../keyvalue"}
