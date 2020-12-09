@@ -11,4 +11,4 @@ Cargo.lock
 
 data
 log
-test.db
+*.db
