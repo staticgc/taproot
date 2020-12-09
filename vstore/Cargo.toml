@@ -17,7 +17,3 @@ xxhash-rust = {version="0.8.0", features = ["xxh3"]}
 anyhow = "1.0"
 log = "0.4"
 env_logger = "0.8"
-
-[[bin]]
-name = "vtest"
-path = "src/vtest/main.rs"

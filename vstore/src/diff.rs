@@ -149,6 +149,8 @@ impl DiffIter {
     pub fn next(&mut self) -> Result<Option<Vec<DiffItem>>, Error> {
         if self.a_pack.is_none() && self.b_pack.is_none() {
             let part_diff_ver = self.next_part_diff();
+            debug!("diff part version found: {:?}", part_diff_ver);
+
             if part_diff_ver.is_none() {
                 return Ok(None);
             }

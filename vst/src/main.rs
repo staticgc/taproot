@@ -5,6 +5,7 @@ mod put;
 mod commit;
 mod head;
 mod diff;
+mod delete;
 
 use util::*;
 
@@ -22,6 +23,7 @@ enum Cli {
     Put(put::PutCmdArgs),
     Commit(commit::CommitCmdArgs),
     Diff(diff::DiffCmdArgs),
+    Delete(delete::DelCmdArgs),
 }
 
 
@@ -47,6 +49,9 @@ fn main() -> Result<(), Error> {
         },
         Cli::Diff(args) => {
             diff::cmd(args)?;
+        },
+        Cli::Delete(args) => {
+            delete::cmd(args)?;
         },
     }
     Ok(())

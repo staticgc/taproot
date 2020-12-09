@@ -129,6 +129,33 @@ impl Tree {
         self.get(key.as_bytes())
     }
 
+    pub fn delete(&self, key: &[u8]) -> Result<(), Error> {
+        let (p_ver, p, _) = self.idx.get_part(key);
+        debug!("delete pver: {} part: {}", p_ver, p);
+
+        if p_ver == 0 {
+            return Ok(());
+        }
+
+        match self.load_pack(p_ver, p)? {
+            None => {
+                return Ok(())
+            },
+            Some(mut pack) => {
+                pack.map.remove(key);
+
+                let buf = pack.to_vec()?;
+
+                debug!("put store kv cver: {} pver: {} part: {}", self.commit.ver, p_ver, p);
+                self.kv.put(self.commit.ver, &p.to_be_bytes()[..], buf)?;
+                self.idx.set_part(p, self.commit.ver);
+                debug!("index part set {:?}", self.idx.get_part(key));
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn get(&self, key: &[u8]) -> Result<Option<Vec<u8>>, Error> {
         let (p_ver, p, _) = self.idx.get_part(key);
         debug!("get pver: {} part: {}", p_ver, p);

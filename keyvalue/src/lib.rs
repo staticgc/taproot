@@ -1,6 +1,7 @@
 mod error;
 pub mod sqlite;
 pub mod rocksdb;
+pub mod compress;
 
 pub use error::Error;
 
