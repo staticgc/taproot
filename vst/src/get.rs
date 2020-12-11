@@ -1,5 +1,5 @@
 
-use crate::create_vstore;
+use crate::open_vstore;
 use structopt::StructOpt;
 use anyhow::Error;
 
@@ -11,9 +11,9 @@ pub struct GetCmdArgs {
 }
 
 pub fn cmd_get(args: GetCmdArgs) -> Result<(), Error> {
-    let v = create_vstore(&args.store_path)?;
+    let v = open_vstore(&args.store_path)?;
 
-    let t = v.immutable(args.ver)?;
+    let t = v.read_only(args.ver)?;
 
     match t.get(args.key.as_bytes())? {
         None => println!("key not found"),

@@ -18,11 +18,11 @@ impl CompressKV {
 }
 
 impl KeyValue for CompressKV {
-    fn put(&self, ver: u16, key: &[u8], val: Vec<u8>) -> Result<(), Error> {
+    fn put(&self, ver: u16, key: &[u8], val: &[u8]) -> Result<(), Error> {
         debug!("compress put {} {} {}", ver, key.len(), val.len());
 
         let cbuf = zstd::block::compress(&val, 0)?;
-        self.kv.put(ver, key, cbuf)?;
+        self.kv.put(ver, key, &cbuf)?;
 
         Ok(())
     }

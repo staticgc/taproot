@@ -7,11 +7,11 @@ pub use error::Error;
 
 
 pub trait KeyValue {
-    fn put(&self, ver: u16, key: &[u8], val: Vec<u8>) -> Result<(), Error>;
+    fn put(&self, ver: u16, key: &[u8], val: &[u8]) -> Result<(), Error>;
     fn get(&self, ver: u16, key: &[u8]) -> Result<Option<Vec<u8>>, Error>;
     fn delete(&self, ver: u16, key: &[u8]) -> Result<(), Error>;
 
-    fn put_str(&self, ver: u16, key: &str, val: Vec<u8>) -> Result<(), Error> {
+    fn put_str(&self, ver: u16, key: &str, val: &[u8]) -> Result<(), Error> {
         self.put(ver, key.as_bytes(), val)
     }
 

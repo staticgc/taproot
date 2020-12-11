@@ -1,5 +1,5 @@
 
-use crate::create_vstore;
+use crate::open_vstore;
 use structopt::StructOpt;
 use anyhow::Error;
 use vstore::diff::DiffType;
@@ -12,7 +12,7 @@ pub struct DiffCmdArgs {
 }
 
 pub fn cmd(args: DiffCmdArgs) -> Result<(), Error> {
-    let v = create_vstore(&args.store_path)?;
+    let v = open_vstore(&args.store_path)?;
 
     let mut d = v.diff(args.aver, args.bver)?;
 

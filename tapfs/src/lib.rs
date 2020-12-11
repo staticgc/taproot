@@ -1,5 +1,12 @@
 
+mod state;
 pub mod fs;
 pub mod file;
-mod inode;
+pub mod inode;
+pub mod dir;
+pub mod error;
+pub mod stat;
+
+
+pub use error::Error;
 

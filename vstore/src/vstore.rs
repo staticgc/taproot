@@ -16,20 +16,25 @@ pub struct VStore {
 }
 
 impl VStore {
-    pub fn new(kv: Arc<Box<dyn KeyValue>>) -> Result<Self, Error>  {
-        let v = if !VStore::check_init(&kv)? {
-            let v= VStore::first_init(&kv)?;
-            v.mark_init()?;
-            kv.sync()?;
-            v
-        }else{
-            debug!("already initialized");
-            VStore::load(&kv)?
-        };
+    pub fn create(kv: Arc<Box<dyn KeyValue>>) -> Result<Self, Error>  {
+        if VStore::check_init(&kv)? {
+            return Err(Error::AlreadyInitedError);
+        }
 
+        let v= VStore::first_init(&kv)?;
+        v.mark_init()?;
+        kv.sync()?;
         debug!("commit state at init: {:?}", v.cstate);
 
         Ok(v)
+    }
+
+    pub fn open(kv: Arc<Box<dyn KeyValue>>) -> Result<VStore, Error> {
+        if !VStore::check_init(&kv)? {
+            return Err(Error::NotInitedError);
+        }
+
+        VStore::load(&kv)
     }
 
     fn load(kv: &Arc<Box<dyn KeyValue>>) -> Result<Self, Error> {
@@ -52,7 +57,7 @@ impl VStore {
         let cstate = CommitState::default();
         let cstate_buf = cstate.to_vec()?;
 
-        kv.put(0, "commits".as_bytes(), cstate_buf)?;
+        kv.put(0, "commits".as_bytes(), &cstate_buf)?;
         
         let v = VStore {
             kv: kv.clone(),
@@ -81,7 +86,7 @@ impl VStore {
         debug!("marking init");
 
         let val = [100];
-        self.kv.put(0, "init".as_bytes(), Vec::from(&val[..]))?;
+        self.kv.put(0, "init".as_bytes(), &val[..])?;
 
         Ok(())
     }
@@ -89,7 +94,7 @@ impl VStore {
     fn write_commit_state(&self) -> Result<(), Error> {
         debug!("writing commit state {:?}", self.cstate);
         let buf = self.cstate.to_vec()?;
-        self.kv.put_str(0, "commits", buf)?;
+        self.kv.put_str(0, "commits", &buf)?;
         Ok(())
     }
 
@@ -107,13 +112,10 @@ impl VStore {
         Ok(t)
     }
 
-    pub fn immutable(&self, ver: u16) -> Result<ImmutableTree, Error> {
+    pub fn read_only(&self, ver: u16) -> Result<Tree, Error> {
         let c = self.cstate.get_commit(ver).ok_or(Error::CommitNotFound(ver))?;
 
         let t = Tree::new_readonly(c, self.kv.clone())?;
-        let t = ImmutableTree {
-            t,
-        };
         Ok(t)
     }
 
@@ -122,11 +124,11 @@ impl VStore {
         let buf = t.idx.to_vec()?;
 
         debug!("syncing index");
-        self.kv.put(t.commit.ver, "index".as_bytes(), buf)?;
+        self.kv.put(t.commit.ver, "index".as_bytes(), &buf)?;
 
         debug!("syncing commit state {:?}", self.cstate);
         let buf = self.cstate.to_vec()?;
-        self.kv.put(0, "commits".as_bytes(), buf)?;
+        self.kv.put(0, "commits".as_bytes(), &buf)?;
 
         debug!("kv sync");
         self.kv.sync()?;

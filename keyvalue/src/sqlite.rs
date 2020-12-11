@@ -57,7 +57,7 @@ impl SqliteDB {
 
 
 impl KeyValue for SqliteDB {
-    fn put(&self, ver: u16, key: &[u8], value: Vec<u8>) -> Result<(), Error> {
+    fn put(&self, ver: u16, key: &[u8], value: &[u8]) -> Result<(), Error> {
 
         let sql = "insert or replace into data values(?,?,?)";
         let db = self.db.lock();

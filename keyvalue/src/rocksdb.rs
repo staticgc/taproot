@@ -27,7 +27,7 @@ impl RocksDB {
 }
 
 impl KeyValue for RocksDB {
-    fn put(&self, ver: u16, key: &[u8], val: Vec<u8>) -> Result<(), Error> {
+    fn put(&self, ver: u16, key: &[u8], val: &[u8]) -> Result<(), Error> {
         let real_key = make_key(ver, key);
 
         self.db.put(&real_key, &val)

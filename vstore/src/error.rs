@@ -4,6 +4,12 @@ pub enum Error {
     #[error("Init error {0}")]
     InitError(String),
 
+    #[error("Vstore is not initialize")]
+    NotInitedError,
+
+    #[error("Vstore already initialized")]
+    AlreadyInitedError,
+
     #[error("Index not found")]
     IndexNotFound,
 

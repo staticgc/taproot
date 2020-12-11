@@ -1,4 +1,4 @@
-use crate::create_vstore;
+use crate::open_vstore;
 use structopt::StructOpt;
 use anyhow::Error;
 
@@ -8,7 +8,7 @@ pub struct HeadCmdArgs {
 }
 
 pub fn cmd(args: HeadCmdArgs) -> Result<(), Error> {
-    let v = create_vstore(&args.store_path)?;
+    let v = open_vstore(&args.store_path)?;
     let cs = v.commit_state();
 
     println!("head version: {}", cs.head_version());

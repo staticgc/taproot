@@ -1,5 +1,5 @@
 
-use crate::create_vstore;
+use crate::open_vstore;
 use structopt::StructOpt;
 use anyhow::Error;
 
@@ -9,7 +9,7 @@ pub struct CommitCmdArgs {
 }
 
 pub fn cmd_commit(args: CommitCmdArgs) -> Result<(), Error> {
-    let v = create_vstore(&args.store_path)?;
+    let v = open_vstore(&args.store_path)?;
 
     let t = v.writable()?;
 

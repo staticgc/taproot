@@ -16,7 +16,15 @@ pub fn create_kv(p: &str) -> Result<Box<dyn KeyValue>, Error> {
 pub fn create_vstore(p: &str) -> Result<VStore, Error> {
     let kv = create_kv(p)?;
     let kv = CompressKV::new(Arc::new(kv));
-    let v = VStore::new(Arc::new(kv))?;
+    let v = VStore::create(Arc::new(kv))?;
+
+    Ok(v)
+}
+
+pub fn open_vstore(p: &str) -> Result<VStore, Error> {
+    let kv = create_kv(p)?;
+    let kv = CompressKV::new(Arc::new(kv));
+    let v = VStore::open(Arc::new(kv))?;
 
     Ok(v)
 }

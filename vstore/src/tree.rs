@@ -95,13 +95,13 @@ impl Tree {
         Ok(pack)
     }
 
-    pub fn put_str(&self, key: &str, val: Vec<u8>) -> Result<(), Error> {
+    pub fn put_str(&self, key: &str, val: &[u8]) -> Result<(), Error> {
         debug!("put_str key: {}", key);
 
         self.put(key.as_bytes(), val)
     }
 
-    pub fn put(&self, key: &[u8], val: Vec<u8>) -> Result<(), Error> {
+    pub fn put(&self, key: &[u8], val: &[u8]) -> Result<(), Error> {
         let (p_ver, p, _) = self.idx.get_part(key);
         debug!("put pver: {} part: {}", p_ver, p);
 
@@ -112,21 +112,20 @@ impl Tree {
             pack
         };
 
-        pack.put(self.commit.ver, key, val);
+        pack.put(self.commit.ver, key, Vec::from(val));
         let buf = pack.to_vec()?;
 
         debug!("put store kv cver: {} pver: {} part: {}", self.commit.ver, p_ver, p);
-        self.kv.put(self.commit.ver, &p.to_be_bytes()[..], buf)?;
+        self.kv.put(self.commit.ver, &p.to_be_bytes()[..], &buf)?;
         self.idx.set_part(p, self.commit.ver);
         debug!("index part set {:?}", self.idx.get_part(key));
 
         Ok(())
     }
 
-    pub fn get_str(&self, key: &str) -> Result<Option<Vec<u8>>, Error> {
-        debug!("get key={}", key);
 
-        self.get(key.as_bytes())
+    pub fn delete_str(&self, key: &str) -> Result<(), Error> {
+        self.delete(key.as_bytes())
     }
 
     pub fn delete(&self, key: &[u8]) -> Result<(), Error> {
@@ -147,13 +146,19 @@ impl Tree {
                 let buf = pack.to_vec()?;
 
                 debug!("put store kv cver: {} pver: {} part: {}", self.commit.ver, p_ver, p);
-                self.kv.put(self.commit.ver, &p.to_be_bytes()[..], buf)?;
+                self.kv.put(self.commit.ver, &p.to_be_bytes()[..], &buf)?;
                 self.idx.set_part(p, self.commit.ver);
                 debug!("index part set {:?}", self.idx.get_part(key));
             }
         }
 
         Ok(())
+    }
+
+    pub fn get_str(&self, key: &str) -> Result<Option<Vec<u8>>, Error> {
+        debug!("get key={}", key);
+
+        self.get(key.as_bytes())
     }
 
     pub fn get(&self, key: &[u8]) -> Result<Option<Vec<u8>>, Error> {
@@ -182,6 +187,10 @@ pub struct ImmutableTree {
 }
 
 impl ImmutableTree {
+    pub fn get_str(&self, key: &str) -> Result<Option<Vec<u8>>, Error> {
+        self.t.get_str(key)
+    }
+
     pub fn get(&self, key: &[u8]) -> Result<Option<Vec<u8>>, Error> {
         self.t.get(key)
     }

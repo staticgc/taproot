@@ -1,5 +1,5 @@
 
-use crate::create_vstore;
+use crate::open_vstore;
 use structopt::StructOpt;
 use anyhow::Error;
 
@@ -11,10 +11,10 @@ pub struct PutCmdArgs {
 }
 
 pub fn cmd_put(args: PutCmdArgs) -> Result<(), Error> {
-    let v = create_vstore(&args.store_path)?;
+    let v = open_vstore(&args.store_path)?;
 
     let t = v.writable()?;
-    t.put(args.key.as_bytes(), Vec::from(args.value.as_bytes()))?;
+    t.put(args.key.as_bytes(), args.value.as_bytes())?;
 
     v.sync_tree(&t)?;
 
